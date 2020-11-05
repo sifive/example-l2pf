@@ -9,7 +9,7 @@
 #include <metal/cpu.h>
 #include <metal/drivers/sifive_ccache0.h>
 #include <metal/drivers/sifive_l2pf0.h>
-#include <metal/machine.h>
+#include <metal/platform.h>
 #include <stdio.h>
 
 /* Check for presence of SiFive L2 Prefetcher */
@@ -62,7 +62,7 @@ static void mem_test() {
   end = (int *)(&metal_segment_heap_target_end - 16);
 
   /* Flush out entire cache */
-  metal_dcache_l1_flush((uintptr_t)&__metal_boot_hart, 0);
+  metal_dcache_l1_flush(0);
 
   /* Read some memory locations */
   while (addr < end) {
@@ -76,14 +76,10 @@ static void mem_test() {
 }
 
 int main() {
-  struct metal_cpu *cpu;
+  struct metal_cpu cpu;
   uint64_t t1, t2;
 
   PRINT("***L2 cache hardware prefetcher demo***\n");
-
-  /* Initialize SiFive L2 cache controller */
-  if (sifive_ccache0_init() != 0)
-    return 1;
 
   /* Keep L2 prefetcher disabled for test */
   sifive_l2pf0_disable();
